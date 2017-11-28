@@ -17,11 +17,13 @@ export default class App extends Component {
       iconURL: '',
       weather: '',
       temp: 0,
-      tempUnit: 'C'
+      tempUnit: 'C',
+      iconClass: ''
     };
 
     // Bind the context of "this" for our getWeather function.
     this.getWeather = this.getWeather.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   // When the component mounts, get the geolocation and call the
@@ -53,32 +55,56 @@ export default class App extends Component {
         iconURL: "http://openweathermap.org/img/w/" + response.data.weather[0].icon + ".png",
         weather: response.data.weather[0].main,
         temp: response.data.main.temp - 273.15,
-        tempUnit: 'C'
+        tempUnit: 'C',
+        iconClass: "wi wi-owm-" + response.data.weather[0].id
       })
     })
+  }
+
+  // Handle the click event.
+  handleClick(e) {
+    e.preventDefault();
+    if (this.state.tempUnit == 'C') {
+      this.setState({
+        tempUnit: 'F',
+        temp: (this.state.temp * 1.8) + 32 })
+    }
+    else if (this.state.tempUnit == 'F') {
+      this.setState({
+        tempUnit: 'C',
+        temp: (this.state.temp - 32) / 1.8 });
+    }
   }
 
   // Finally, call the render function to get everything on screen.
   render() {
     return (
-      <div>
-        <div className="row">
-          <div className="col">What's the weather like in</div>
-        </div>
-        <div className="row">
-          <div className="col">{this.state.location}</div>
-        </div>
-        <div className="row">
-          <div className="col"><img src={this.state.iconURL}/></div>
-        </div>
-        <div className="row">
-          <div className="col">{this.state.weather}</div>
-        </div>
-        <div className="row">
-          <div className="col">{_.round(this.state.temp,2)}&#176;{this.state.tempUnit}</div>
-        </div>
+      <div className="container-fluid">
+        <div className="row text-center align-items-center">
+
+          <div className="col-12 header">
+            here's the weather in
+          </div>
+
+          <div className="col-12 location">
+            {this.state.location}
+          </div>
+
+          <div className="col-12 col-md-4 push-md-8 icon">
+            {/*<img src={this.state.iconURL} className="img-fluid"/>*/}
+            <i className={this.state.iconClass}></i>
+          </div>
+
+          <div className="col-12 col-md-8 pull-md-4 weather">
+            {this.state.weather}
+          </div>
+
+          <div className="col-12 temperature" onClick={this.handleClick}>
+            {_.round(this.state.temp,2)}&#176;{this.state.tempUnit}
+          </div>
 
       </div>
+    </div>
     );
   }
 }
